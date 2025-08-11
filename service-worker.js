@@ -1,4 +1,4 @@
-const CACHE_NAME = 'math-app-v1';
+const CACHE_NAME = 'fmpn-v1';
 const urlsToCache = [
     '/',
     '/index.html',
