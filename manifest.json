@@ -1,6 +1,6 @@
 {
-    "name": "العوامل والمضاعفات",
-    "short_name": "رياضيات",
+    "name": "FMPN",
+    "short_name": "FMPN",
     "description": "تطبيق ويب لحساب العوامل والمضاعفات وتحليل الأعداد الأولية.",
     "start_url": "/index.html",
     "display": "standalone",
