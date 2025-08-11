@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FMPN</title>
+    <title>العوامل والمضاعفات</title>
 
-    <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
     <meta name="theme-color" content="#2c3e50">
 
     <style>
@@ -145,6 +145,14 @@
             border-radius: 8px;
             border: 1px dashed var(--secondary-color);
         }
+        
+        .solution-box .result-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0;
+            margin-top: 5px;
+        }
 
         .solution-box {
             border-color: var(--accent-color);
@@ -163,8 +171,8 @@
         }
 
         .solution-box li {
-            margin-bottom: 5px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         .result-box p {
@@ -220,30 +228,23 @@
         .prime-factor {
             display: inline-block;
             font-weight: bold;
-            padding: 4px;
-            margin: 0 2px;
+            padding: 4px 8px;
+            margin: 0 4px;
             min-width: 25px;
             text-align: center;
             border-radius: 4px;
-            color: var(--text-color);
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
         }
 
-        .common-factor {
-            border: 2px solid var(--accent-color);
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
-            animation: pulse 1.5s infinite;
+        .prime-factor:hover {
+            transform: translateY(-2px);
         }
 
-        .uncommon-factor {
-            border: 2px solid var(--secondary-color);
-            border-radius: 50%;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .prime-factor.uncommon {
+            background-color: #ccc !important;
+            color: #000 !important;
         }
 
         /* Styles for Page 2: Factor Tree */
@@ -334,7 +335,8 @@
         #prime-numbers-tab label {font-weight:bold; font-size:18px; display:block; margin:10px 0 5px; background:#ccc; color:#9370DB; border-radius:6px; padding:6px;}
         #prime-numbers-tab input[type=number] {width:80px; padding:5px; margin:5px; font-size:16px; font-weight:bold;}
         #prime-numbers-tab button {padding:8px 16px; margin:5px; font-size:16px; font-weight:bold; cursor:pointer; background-color: #4B0082; color: white; border: none; border-radius: 6px;}
-        #prime-numbers-tab .primes-grid {display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px; direction:ltr;}
+        /* === MODIFIED CSS RULE === */
+        #prime-numbers-tab .primes-grid {display:flex; flex-wrap: wrap; gap: 15px; justify-content:flex-start; margin-top:15px; direction:ltr; text-align: left;}
         #prime-numbers-tab .prime {padding:6px 10px; border-radius:4px; display:inline-block; color:white; font-size:16px; min-width:40px; font-weight:bold;}
         #prime-numbers-tab #primesBox-prime, #prime-numbers-tab #primeAtBox, #prime-numbers-tab #checkBox, #prime-numbers-tab #surroundingBox, #prime-numbers-tab #rankBox {margin-top:10px; padding:10px; background-color:#e6e6fa; border: 2px solid #9370DB; border-radius:8px; word-wrap:break-word; font-size:18px; font-weight:bold; min-height:50px; direction:rtl; display:block;}
         #prime-numbers-tab #factorsBox-prime {direction:ltr; display:inline-block; background:#ccc; color:#9370DB; border-radius:6px; font-weight:bold; margin-top:10px; font-size:18px; padding:4px 8px; white-space:nowrap;}
@@ -378,7 +380,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>FMPN</h1>
+        <h1>🔢 العوامل والمضاعفات</h1>
     </div>
 
     <div class="container">
@@ -418,7 +420,7 @@
                 <button onclick="calculateMultiples()">احسب المضاعفات المشتركة</button>
             </div>
             <div id="result-multiples" class="result-box" style="display: none;">
-                <p>أول 10 مضاعفات مشتركة:</p>
+                <p>أول 5 مضاعفات مشتركة:</p>
                 <ul id="multiples-list" class="result-list"></ul>
             </div>
             <div id="solution-multiples" class="solution-box" style="display: none;"></div>
@@ -511,7 +513,7 @@
         // تسجيل الـ Service Worker لتفعيل PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
+                navigator.serviceWorker.register('service-worker.js')
                     .then(registration => {
                         console.log('Service Worker registered successfully: ', registration);
                     })
@@ -581,7 +583,45 @@
             }
             return factors;
         }
-        
+
+        const factorColors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#34495e', '#d35400', '#c0392b'];
+
+        function getColoredPrimeFactors(factors1, factors2) {
+            const factors1Copy = [...factors1];
+            const factors2Copy = [...factors2];
+            const result1 = [];
+            const result2 = [];
+            const commonFactors = [];
+            let colorIndex = 0;
+
+            for (let i = 0; i < factors1.length; i++) {
+                const factor1 = factors1[i];
+                const indexIn2 = factors2Copy.indexOf(factor1);
+                if (indexIn2 > -1) {
+                    const color = factorColors[colorIndex % factorColors.length];
+                    result1.push(`<span class="prime-factor" style="background:${color};">${factor1}</span>`);
+                    result2.push(`<span class="prime-factor" style="background:${color};">${factors2Copy[indexIn2]}</span>`);
+                    commonFactors.push(factor1);
+                    factors2Copy.splice(indexIn2, 1);
+                    colorIndex++;
+                } else {
+                    result1.push(`<span class="prime-factor uncommon" style="background-color:#ccc; color:#000;">${factor1}</span>`);
+                }
+            }
+
+            factors2Copy.forEach(factor2 => {
+                result2.push(`<span class="prime-factor uncommon" style="background-color:#ccc; color:#000;">${factor2}</span>`);
+            });
+
+            return {
+                html1: result1.join(' × '),
+                html2: result2.join(' × '),
+                commonFactors,
+                allFactors: [...commonFactors, ...factors1.filter(f => !factors2.includes(f)), ...factors2.filter(f => !factors1.includes(f))]
+            };
+        }
+
+
         function formatFactorsWithHighlight(factors, commonFactors) {
             return factors.map(f => {
                 if (commonFactors.includes(f)) {
@@ -589,44 +629,6 @@
                 }
                 return `<span class="factor-item">${f}</span>`;
             }).join('');
-        }
-        
-        function formatPrimeFactorsWithHighlight(factors1, factors2) {
-            const factors1Copy = [...factors1];
-            const factors2Copy = [...factors2];
-        
-            const result1 = [];
-            const result2 = [];
-            const commonFactors = [];
-            
-            // Highlight common factors
-            factors1Copy.forEach(f => {
-                const indexIn2 = factors2Copy.indexOf(f);
-                if (indexIn2 > -1) {
-                    result1.push(`<span class="prime-factor common-factor">${f}</span>`);
-                    factors2Copy.splice(indexIn2, 1);
-                    commonFactors.push(f);
-                } else {
-                    result1.push(`<span class="prime-factor uncommon-factor">${f}</span>`);
-                }
-            });
-        
-            // Add remaining factors from factors2 to result2 with uncommon highlight
-            factors2.forEach(f => {
-                const indexIn1 = factors1.indexOf(f);
-                const indexInCommon = commonFactors.indexOf(f);
-                if (indexIn1 > -1 && indexInCommon > -1) {
-                    result2.push(`<span class="prime-factor common-factor">${f}</span>`);
-                } else {
-                    result2.push(`<span class="prime-factor uncommon-factor">${f}</span>`);
-                }
-            });
-
-            return {
-                html1: result1.join(' × '),
-                html2: result2.join(' × '),
-                commonFactors,
-            };
         }
 
         function calculateFactors() {
@@ -653,17 +655,17 @@
                 <h3>خطوات الحل:</h3>
                 <ol>
                     <li>نوجد جميع عوامل العدد الأول (${num1}):
-                        <p class="result-list rtl">${formatFactorsWithHighlight(factors1, commonFactors)}</p>
+                        <div class="result-list rtl">${formatFactorsWithHighlight(factors1, commonFactors)}</div>
                     </li>
                     <li>نوجد جميع عوامل العدد الثاني (${num2}):
-                        <p class="result-list rtl">${formatFactorsWithHighlight(factors2, commonFactors)}</p>
+                        <div class="result-list rtl">${formatFactorsWithHighlight(factors2, commonFactors)}</div>
                     </li>
                     <li>العوامل المشتركة هي الأعداد التي تظهر في كلا القائمتين، وقد تم تمييزها بإطار أحمر.</li>
                 </ol>
             `;
             solutionDiv.style.display = 'block';
         }
-        
+
         function calculateGCF() {
             const num1 = parseInt(document.getElementById('num1-gcf').value);
             const num2 = parseInt(document.getElementById('num2-gcf').value);
@@ -671,27 +673,11 @@
                 alert("الرجاء إدخال أعداد صحيحة وموجبة.");
                 return;
             }
-            
             const factors1 = getPrimeFactorsArray(num1);
             const factors2 = getPrimeFactorsArray(num2);
-            
-            const factors1Copy = [...factors1];
-            const factors2Copy = [...factors2];
-            const commonFactors = [];
-            
-            factors1Copy.forEach(f => {
-                const indexIn2 = factors2Copy.indexOf(f);
-                if (indexIn2 > -1) {
-                    commonFactors.push(f);
-                    factors2Copy.splice(indexIn2, 1);
-                }
-            });
-            
+            const { html1, html2, commonFactors } = getColoredPrimeFactors(factors1, factors2);
             let gcf = 1;
             commonFactors.forEach(f => gcf *= f);
-
-            const { html1, html2 } = formatPrimeFactorsWithHighlight(factors1, factors2);
-
             document.getElementById('gcf-value').innerHTML = `<span class="result-item">${gcf}</span>`;
             document.getElementById('result-gcf').style.display = 'block';
             const solutionDiv = document.getElementById('solution-gcf');
@@ -699,19 +685,19 @@
                 <h3>خطوات الحل:</h3>
                 <ol>
                     <li>نحلل العدد الأول (${num1}) إلى عوامله الأولية:
-                        <p>${num1} = ${html1}</p>
+                        <p style="direction: ltr; text-align: left;">${num1} = ${html1}</p>
                     </li>
                     <li>نحلل العدد الثاني (${num2}) إلى عوامله الأولية:
-                        <p>${num2} = ${html2}</p>
+                        <p style="direction: ltr; text-align: left;">${num2} = ${html2}</p>
                     </li>
-                    <li>العامل المشترك الأعلى هو حاصل ضرب العوامل الأولية المشتركة فقط.
-                       العوامل المشتركة هي التي تم تمييزها باللون الأحمر.</li>
-                    <li>ع.م.أ = ${commonFactors.join(' × ')} = ${gcf}</li>
+                    <li>العامل المشترك الأعلى هو حاصل ضرب العوامل الأولية المشتركة فقط (العوامل ذات الألوان الموحدة).</li>
+                    <li>ع.م.أ = ${commonFactors.length > 0 ? commonFactors.join(' × ') : '1'} = ${gcf}</li>
                 </ol>
             `;
             solutionDiv.style.display = 'block';
         }
 
+        // === MODIFIED JAVASCRIPT FUNCTION ===
         function calculateMultiples() {
             const num1 = parseInt(document.getElementById('num1-multiples').value);
             const num2 = parseInt(document.getElementById('num2-multiples').value);
@@ -720,39 +706,59 @@
                 return;
             }
             
-            const lcmVal = (num1 * num2) / calculateGCD(num1, num2);
-            
+            // Helper function to render multiples with highlighting
+            function formatMultiplesWithHighlight(multiples, common) {
+                return multiples.map(m => {
+                    if (common.includes(m)) {
+                         // Use accent color for common multiples
+                        return `<span class="result-item" style="background-color: var(--accent-color); border: 2px solid white;">${m}</span>`;
+                    }
+                    return `<span class="result-item">${m}</span>`;
+                }).join('');
+            }
+
+            // 1. Generate first 7 multiples for each number
+            const multiples1 = Array.from({length: 7}, (_, i) => num1 * (i + 1));
+            const multiples2 = Array.from({length: 7}, (_, i) => num2 * (i + 1));
+
+            // 2. Find common multiples between these two lists
+            const commonInLists = multiples1.filter(m => multiples2.includes(m));
+
+            // 3. Calculate the actual LCM (robustly)
+            let a = num1, b = num2;
+            while(b) { [a, b] = [b, a % b]; }
+            const gcd = a;
+            const lcmVal = (num1 * num2) / gcd;
+
+            // 4. Generate the final 5 multiples of the LCM
+            const finalMultiples = Array.from({length: 5}, (_, i) => lcmVal * (i + 1));
             const multiplesList = document.getElementById('multiples-list');
             multiplesList.innerHTML = '';
-            const maxMultiples = 10;
-            const commonMultiples = [];
-            for (let i = 1; i <= maxMultiples; i++) {
-                const multiple = lcmVal * i;
+            finalMultiples.forEach(multiple => {
                 const li = document.createElement('li');
                 li.className = 'result-item';
                 li.textContent = multiple;
                 multiplesList.appendChild(li);
-                commonMultiples.push(multiple);
-            }
-            
+            });
             document.getElementById('result-multiples').style.display = 'block';
+
+            // 5. Build the solution explanation
             const solutionDiv = document.getElementById('solution-multiples');
             solutionDiv.innerHTML = `
                 <h3>خطوات الحل:</h3>
                 <ol>
-                    <li>أولاً، نوجد المضاعف المشترك الأصغر (م.م.أ) للعددين. م.م.أ = ${lcmVal}.</li>
-                    <li>المضاعفات المشتركة الأخرى هي مضاعفات هذا العدد.</li>
-                    <li>أول 10 مضاعفات مشتركة هي: ${commonMultiples.join(', ')}</li>
+                    <li>نضاعف العدد الأول (${num1}) 7 مرات:
+                        <div class="result-list rtl">${formatMultiplesWithHighlight(multiples1, commonInLists)}</div>
+                    </li>
+                    <li>نضاعف العدد الثاني (${num2}) 7 مرات:
+                        <div class="result-list rtl">${formatMultiplesWithHighlight(multiples2, commonInLists)}</div>
+                    </li>
+                    <li>المضاعفات المشتركة الظاهرة (المميزة باللون الأحمر) هي: ${commonInLists.join(', ') || 'لا يوجد ضمن أول 7 مضاعفات'}.</li>
+                    <li>أصغر مضاعف مشترك بين العددين (م.م.أ) هو <strong>${lcmVal}</strong>.</li>
+                    <li>الآن، نضاعف هذا العدد 5 مرات للحصول على النتيجة النهائية.</li>
                 </ol>
             `;
             solutionDiv.style.display = 'block';
-        }
-
-        function calculateGCD(a, b) {
-            while (b) {
-                [a, b] = [b, a % b];
-            }
-            return a;
         }
 
         function calculateLCM() {
@@ -762,29 +768,33 @@
                 alert("الرجاء إدخال أعداد صحيحة وموجبة.");
                 return;
             }
-
             const factors1 = getPrimeFactorsArray(num1);
             const factors2 = getPrimeFactorsArray(num2);
-
-            const factors1Copy = [...factors1];
-            const factors2Copy = [...factors2];
             
-            const allFactors = [];
+            // Re-create prime factor copies for coloring
+            const factors1ForColoring = [...factors1];
+            const factors2ForColoring = [...factors2];
+            const { html1, html2 } = getColoredPrimeFactors(factors1ForColoring, factors2ForColoring);
 
-            factors1Copy.forEach(f => {
-                const indexIn2 = factors2Copy.indexOf(f);
-                if (indexIn2 > -1) {
-                    allFactors.push(f);
-                    factors2Copy.splice(indexIn2, 1);
-                } else {
-                    allFactors.push(f);
+            const allFactors = [];
+            const tempFactors2 = [...factors2];
+
+            // Add all factors from num1
+            for (const factor1 of factors1) {
+                allFactors.push(factor1);
+                // Remove one matching factor from num2's copy if it exists
+                const index = tempFactors2.indexOf(factor1);
+                if (index > -1) {
+                    tempFactors2.splice(index, 1);
                 }
-            });
-            factors2Copy.forEach(f => allFactors.push(f));
+            }
+            // Add the remaining unique factors from num2
+            allFactors.push(...tempFactors2);
+            
+            allFactors.sort((a,b) => a - b); // For consistent display
 
             const lcm = allFactors.reduce((acc, curr) => acc * curr, 1);
-            const { html1, html2 } = formatPrimeFactorsWithHighlight(factors1, factors2);
-
+            
             document.getElementById('lcm-value').innerHTML = `<span class="result-item">${lcm}</span>`;
             document.getElementById('result-lcm').style.display = 'block';
             const solutionDiv = document.getElementById('solution-lcm');
@@ -792,12 +802,12 @@
                 <h3>خطوات الحل:</h3>
                 <ol>
                     <li>نحلل العدد الأول (${num1}) إلى عوامله الأولية:
-                        <p>${num1} = ${html1}</p>
+                        <p style="direction: ltr; text-align: left;">${num1} = ${html1}</p>
                     </li>
                     <li>نحلل العدد الثاني (${num2}) إلى عوامله الأولية:
-                        <p>${num2} = ${html2}</p>
+                        <p style="direction: ltr; text-align: left;">${num2} = ${html2}</p>
                     </li>
-                    <li>المضاعف المشترك الأصغر هو حاصل ضرب جميع العوامل الأولية التي تمثل كل عدد. نأخذ العوامل المشتركة (المميزة باللون الأحمر) مرة واحدة وجميع العوامل غير المشتركة (المميزة باللون الأزرق).</li>
+                    <li>المضاعف المشترك الأصغر هو حاصل ضرب جميع العوامل الأولية من كلا العددين، مع أخذ أكبر تكرار لكل عامل. (نأخذ كل العوامل من العدد الأول، ثم نضيف العوامل المتبقية من العدد الثاني).</li>
                     <li>م.م.أ = ${allFactors.join(' × ')} = ${lcm}</li>
                 </ol>
             `;
@@ -961,7 +971,7 @@
         function saveAsImage() {
             const tree = document.getElementById('treeContainer');
             domtoimage.toPng(tree, {
-                bgcolor: 'var(--bg-color)'
+                bgcolor: '#ecf0f1' // Use a solid color for better compatibility
             }).then(function (dataUrl) {
                 const link = document.createElement('a');
                 link.download = `شجرة-عوامل-${document.getElementById('numberInput').value}.png`;
