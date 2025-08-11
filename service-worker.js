@@ -1,10 +1,10 @@
 const CACHE_NAME = 'fmpn-v1';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/icon-192x192.png',
-    '/icon-512x512.png',
+    './',
+    './index.html',
+    './manifest.json',
+    './icon-192x192.png',
+    './icon-512x512.png',
     'https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js',
     'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
 ];
